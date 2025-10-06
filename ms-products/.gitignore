@@ -83,7 +83,7 @@ http-client.private.env.json
 .idea/ApifoxUploaderProjectSetting.xml
 
 # Custom for the project
-../node_modules/
+node_modules
 src/dev.sqlite
 src/ms-products/.env
 coverage/
