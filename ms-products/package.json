@@ -5,8 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node src/server.js",
-    "test": "jest --coverage"
+    "dev": "nodemon src/server.js",
+    "debug": "node --inspect=0.0.0.0:9229 src/server.js",
+    "test": "mocha --recursive --reporter spec",
+    "test:coverage": "nyc --reporter=lcov --reporter=text mocha --recursive"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,7 @@
     "express": "^4.21.2",
     "express-validator": "^6.15.0",
     "morgan": "^1.10.1",
+    "node-fetch": "^3.3.2",
     "sqlite3": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.3"

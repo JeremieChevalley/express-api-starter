@@ -8,13 +8,13 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Products API',
+            title: 'Product Items API',
             version: '1.0.0',
-            description: 'RESTful API for product management (SQLite, Express).'
+            description: 'RESTful API for product item management (SQLite, Express).'
         },
         servers: [
             {
-                url: `http://localhost:${port}/api/v1`,
+                url: `http://localhost:${port}`,
                 description: 'Local development server'
             },
         ],

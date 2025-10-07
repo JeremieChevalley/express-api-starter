@@ -1,86 +1,107 @@
-// controllers/productController.js
-const { validationResult } = require('express-validator');
-const Product = require('../entities/Product');
+const ProductService = require('../services/productService');
 
-/**
- * Controller functions use Express (req, res) signatures and
- * respond with status codes matching MDN/HTTP recommendations.
- */
-
-exports.create = async (req, res, next) => {
-    try {
-        // validation result
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            // 400 Bad Request for validation problems
-            return res.status(400).json({ errors: errors.array() });
+const ProductController = {
+    // GET /api/v1/products
+    async findAll(req, res) {
+        try {
+            const products = await ProductService.getAll();
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
+    },
 
-        const { name, description, imageUrl, price } = req.body;
-        const created = await Product.create({ name, description, imageUrl, price });
-        // 201 Created
-        return res.status(201).json(created);
-    } catch (err) {
-        next(err);
-    }
-};
-
-exports.findAll = async (req, res, next) => {
-    try {
-        const products = await Product.findAll();
-        // 200 OK
-        return res.status(200).json(products);
-    } catch (err) {
-        next(err);
-    }
-};
-
-exports.findOne = async (req, res, next) => {
-    try {
-        const id = Number(req.params.id);
-        if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid product id' });
-
-        const product = await Product.findById(id);
-        if (!product) return res.status(404).json({ error: 'Product not found' }); // 404 Not Found
-
-        return res.status(200).json(product);
-    } catch (err) {
-        next(err);
-    }
-};
-
-exports.update = async (req, res, next) => {
-    try {
-        // validation result
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+    // GET /api/v1/products/:id
+    async findOne(req, res) {
+        try {
+            const product = await ProductService.getById(req.params.id);
+            if (!product) return res.status(404).json({ error: 'Product not found' });
+            res.json(product);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
+    },
 
-        const id = Number(req.params.id);
-        if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid product id' });
+    // POST /api/v1/products
+    async create(req, res) {
+        try {
+            const product = await ProductService.create(req.body);
+            res.status(201).json(product);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 
-        const { name, description, imageUrl, price } = req.body;
-        const updated = await Product.update(id, { name, description, imageUrl, price });
-        if (!updated) return res.status(404).json({ error: 'Product not found' }); // 404 Not Found
+    // PUT /api/v1/products/:id/
+    async update(req, res) {
+        try {
+            const { id } = req.params;
+            const updatedProduct = await ProductService.update(id, req.body);
+            if (!updatedProduct) return res.status(404).json({ error: 'Product not found' });
+            res.json(updatedProduct);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 
-        return res.status(200).json(updated);
-    } catch (err) {
-        next(err);
+    // DELETE /api/v1/products/:id/
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
+            const deleted = await ProductService.delete(id);
+            if (!deleted) return res.status(404).json({ error: 'Product not found' });
+            res.status(204).send(); // 204 No Content
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
+    // GET /api/v1/products/:id/full
+    // Returns product + list of items
+    async getProductWithItems(req, res) {
+        try {
+            const { id } = req.params;
+            const product = await ProductService.getProductWithItems(id);
+            res.json(product);
+        } catch (error) {
+            res.status(404).json({ error: error.message });
+        }
+    },
+
+    // POST /api/v1/products/:id/compositions
+    async addComposition(req, res) {
+        try {
+            const { id } = req.params;
+            const { item_id, quantity, unit } = req.body;
+            const composition = await ProductService.addComposition(id, item_id, quantity, unit);
+            res.status(201).json(composition);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    },
+
+    // GET /api/v1/products/:id/compositions
+    async getCompositions(req, res) {
+        try {
+            const { id } = req.params;
+            const compositions = await ProductService.getCompositions(id);
+            res.json(compositions);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
+    // GET /api/v1/products/:id/compositions
+    async deleteCompositions(req, res) {
+        try {
+            const { id } = req.params;
+            const deleted = await ProductService.deleteCompositions(id);
+            if (!deleted) return res.status(404).json({ error: 'Composition not found' });
+            res.status(204).send(); // 204 No Content
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 };
 
-exports.delete = async (req, res, next) => {
-    try {
-        const id = Number(req.params.id);
-        if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid product id' });
-
-        const deleted = await Product.delete(id);
-        if (deleted === 0) return res.status(404).json({ error: 'Product not found' });
-
-        // 204 No Content on successful delete
-        return res.status(204).send();
-    } catch (err) {
-        next(err);
-    }
-};
+module.exports = ProductController;

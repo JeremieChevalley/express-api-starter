@@ -18,7 +18,7 @@ A simple RESTful API to manage products (CRUD) built with **Express**, **SQLite3
 ```bash
 │   .env
 │   .gitignore
-│   dev.sqlite
+│   products.sqlite
 │   package-lock.json
 │   package.json
 │   README.md
@@ -35,13 +35,13 @@ A simple RESTful API to manage products (CRUD) built with **Express**, **SQLite3
     │       swagger.js
     │
     ├───controllers
-    │       productController.js
+    │       productItemController.js
     │
     ├───entities
-    │       Product.js
+    │       ProductItem.js
     │
     └───routes
-            products.js
+            productItems.js
             router.js
 ```
 
@@ -50,6 +50,7 @@ A simple RESTful API to manage products (CRUD) built with **Express**, **SQLite3
 Clone the repository, then install dependencies:
 
 ```bash
+cd ms-products
 npm install
 ```
 
@@ -79,7 +80,8 @@ The .env file defines:
 
 ```bash
 PORT=3000
-DB_FILE=./dev.sqlite
+DB_FILE=./products.sqlite
 NODE_ENV=development
+PRODUCT_ITEM_SERVICE_URL=http://localhost:3001
 ```
 

@@ -1,12 +1,14 @@
 {
-  "name": "products-api",
+  "name": "product-items-api",
   "version": "1.0.0",
   "description": "RESTful Products API with sqlite3, express-validator, and swagger-ui",
-  "main": "./src/server.js",
+  "main": "server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest --coverage"
+    "debug": "node --inspect=0.0.0.0:9229 src/server.js",
+    "test": "mocha --recursive --reporter spec",
+    "test:coverage": "nyc --reporter=lcov --reporter=text mocha --recursive"
   },
   "keywords": [],
   "author": "",

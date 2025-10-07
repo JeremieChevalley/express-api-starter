@@ -1,0 +1,55 @@
+@startuml
+title Product-Service Architecture (Updated)
+
+package "Controller Layer" {
+    class ProductController {
+        +getAll()
+        +getById(id)
+        +create(product)
+        +update(id, product)
+        +addComposition(productId, itemId, quantity)
+        +getCompositions(productId)
+        +getProductWithItems(productId)
+    }
+}
+
+package "Service Layer" {
+    class ProductService {
+        +getAll()
+        +getById(id)
+        +create(product)
+        +update(id, product)
+        +addComposition(productId, itemId, quantity)
+        +getCompositions(productId)
+        +getProductWithItems(productId)
+    }
+}
+
+package "Entity / Data Layer" {
+    class ProductEntity {
+        +findAll()
+        +findById(id)
+        +insert(product)
+        +update(id, product)
+        +insertComposition(productId, itemId, quantity, unit)
+        +findCompositions(productId)
+    }
+}
+
+package "External Microservice" {
+    class ProductItemService {
+        +GET /productItems/:id
+        +GET /productItems?ids=...
+    }
+}
+
+' Controller → Service
+ProductController --> ProductService : calls methods
+
+' Service → Entity
+ProductService --> ProductEntity : executes SQL
+
+' Service → External Microservice
+ProductService --> ProductItemService : validates items, fetches details
+
+@enduml

@@ -1,6 +1,6 @@
-# Products API
+# Product Items API
 
-A simple RESTful API to manage products (CRUD) built with **Express**, **SQLite3**, **express-validator**, and documented with **Swagger UI**.
+A simple RESTful API to manage product items (CRUD) built with **Express**, **SQLite3**, **express-validator**, and documented with **Swagger UI**.
 
 ---
 
@@ -18,7 +18,7 @@ A simple RESTful API to manage products (CRUD) built with **Express**, **SQLite3
 ```bash
 │   .env
 │   .gitignore
-│   dev.sqlite
+│   productItems.sqlite
 │   package-lock.json
 │   package.json
 │   README.md
@@ -35,13 +35,13 @@ A simple RESTful API to manage products (CRUD) built with **Express**, **SQLite3
     │       swagger.js
     │
     ├───controllers
-    │       productController.js
+    │       productItemController.js
     │
     ├───entities
-    │       Product.js
+    │       ProductItem.js
     │
     └───routes
-            products.js
+            productItems.js
             router.js
 ```
 
@@ -50,6 +50,7 @@ A simple RESTful API to manage products (CRUD) built with **Express**, **SQLite3
 Clone the repository, then install dependencies:
 
 ```bash
+cd ms-productItems
 npm install
 ```
 
@@ -69,16 +70,16 @@ npm start
 
 ## Usage
 
-API base URL: http://localhost:3000/api
+API base URL: http://localhost:3001/api
 
-Swagger UI docs: http://localhost:3000/docs
+Swagger UI docs: http://localhost:3001/docs
 
 ## Environment
 
 The .env file defines:
 
 ```bash
-PORT=3000
+PORT=3001
 DB_FILE=./dev.sqlite
 NODE_ENV=development
 ```

@@ -1,71 +1,105 @@
-// entities/Product.js
+// src/entities/Product.js
 const db = require('../config/database');
 
-class Product {
-    static create({ name, description, imageUrl, price }) {
-        const sql = `INSERT INTO products (name, description, imageUrl, price, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`;
-        const params = [name, description || null, imageUrl || null, price];
-
+const Product = {
+    findAll() {
         return new Promise((resolve, reject) => {
-            db.run(sql, params, function (err) {
-                if (err) return reject(err);
-                // fetch created row
-                Product.findById(this.lastID).then(resolve).catch(reject);
+            db.all('SELECT * FROM products', (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
             });
         });
-    }
+    },
 
-    static findAll() {
-        const sql = `SELECT * FROM products ORDER BY id DESC`;
+    findById(id) {
         return new Promise((resolve, reject) => {
-            db.all(sql, [], (err, rows) => {
-                if (err) return reject(err);
-                resolve(rows);
+            db.get('SELECT * FROM products WHERE id = ?', [id], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
             });
         });
-    }
+    },
 
-    static findById(id) {
-        const sql = `SELECT * FROM products WHERE id = ?`;
+    insert(product) {
+        const { name, price } = product;
         return new Promise((resolve, reject) => {
-            db.get(sql, [id], (err, row) => {
-                if (err) return reject(err);
-                resolve(row || null);
-            });
+            db.run(
+                `INSERT INTO products (name, price) VALUES (?, ?)`,
+                [name, price],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve({ id: this.lastID, ...product });
+                }
+            );
         });
-    }
+    },
 
-    static update(id, { name, description, imageUrl, price }) {
-        const sql = `
-      UPDATE products
-      SET name = COALESCE(?, name),
-          description = COALESCE(?, description),
-          imageUrl = COALESCE(?, imageUrl),
-          price = COALESCE(?, price),
-          updated_at = datetime('now')
-      WHERE id = ?
-    `;
-        const params = [name, description, imageUrl, price, id];
-
+    update(id, product) {
+        const { name, price } = product;
         return new Promise((resolve, reject) => {
-            db.run(sql, params, function (err) {
-                if (err) return reject(err);
-                if (this.changes === 0) return resolve(null);
-                Product.findById(id).then(resolve).catch(reject);
-            });
+            db.run(
+                `UPDATE products SET name = ?, price = ?, updated_at = datetime('now') WHERE id = ?`,
+                [name, price, id],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve({ id, ...product });
+                }
+            );
         });
-    }
+    },
 
-    static delete(id) {
-        const sql = `DELETE FROM products WHERE id = ?`;
+    delete(id) {
         return new Promise((resolve, reject) => {
-            db.run(sql, [id], function (err) {
-                if (err) return reject(err);
-                resolve(this.changes); // number of rows deleted
-            });
+            db.run(
+                'DELETE FROM products WHERE id = ?',
+                [id],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve(this.changes > 0); // true if a row was deleted
+                }
+            );
         });
-    }
-}
+    },
+
+    findCompositions(productId) {
+        return new Promise((resolve, reject) => {
+            db.all(
+                'SELECT * FROM product_compositions WHERE product_id = ?',
+                [productId],
+                (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                }
+            );
+        });
+    },
+
+    insertComposition(productId, itemId) {
+        return new Promise((resolve, reject) => {
+            db.run(
+                `INSERT INTO product_compositions (product_id, item_id)
+         VALUES (?, ?, ?, ?)`,
+                [productId, itemId],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve({ id: this.lastID, productId, itemId});
+                }
+            );
+        });
+    },
+
+    deleteCompositions(id) {
+        return new Promise((resolve, reject) => {
+            db.run(
+                'DELETE FROM product_compositions WHERE id = ?',
+                [id],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve(this.changes > 0); // true if a row was deleted
+                }
+            );
+        });
+    },
+};
 
 module.exports = Product;
